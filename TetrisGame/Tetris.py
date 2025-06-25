@@ -172,7 +172,13 @@ def rotate():
         block.rotation = last_rotation
 
 score = 0
+
 font = pygame.font.SysFont('Arial', 30, True, False)
+font2 = pygame.font.SysFont('Arial', 50, True, False)
+
+finished_text = font2.render('GAME OVER', True, (255,255,255))
+finished_text_pos = ((screen.get_width() - finished_text.get_width())//2,(screen.get_height() - finished_text.get_height())//2)
+game_finished = False
 
 while not game_over:
     clock.tick(fps)
@@ -196,12 +202,18 @@ while not game_over:
     if block is not None:
         draw_block()
         if event.type != pygame.KEYDOWN:
-            if not drop_block():
+            if not drop_block() and not game_finished:
                 score += find_lines()
                 block = Block(random.randint(5, cols - 5), 0)
+                if collides(0, 0):
+                    game_finished = True
+
 
     text = font.render("SCORE: " + str(score), True, (255, 255, 255))
     screen.blit(text, [0,0])
+
+    if game_finished == True:
+        screen.blit(finished_text, finished_text_pos)
     pygame.display.update()
 
 pygame.quit()
