@@ -2,18 +2,18 @@ import pygame
 
 #blocks are the various shapes when occupied in a Matrix. Here it is a 3x3 Matrix
 blocks = [
-    [[1,4,7], [3, 4, 5]], #straight
-    [[1,3,4,5,7]], #cross
-    [[0,1,4,5], [1,3,4,6]], #two on two 1
-    [[1,2,3,4],[0,3,4,7]], #two on two
-    [[0,1,3,6],[0,1,2,5],[2,5,7,8],[3,6,7,8]], #L1
-    [[1,2,5,8], [5,6,7,8], [0,3,6,7],[0,1,2,8]], #one one three
-    [[4,6,7,8],[0,3,4,6],[0,1,2,4],[2,4,5,8]] #one on three
+    [[1, 4, 7], [3, 4, 5]],  #straight
+    [[1, 3, 4, 5, 7]],  #cross
+    [[0, 1, 4, 5], [1, 3, 4, 6]],  #two on two 1
+    [[1, 2, 3, 4], [0, 3, 4, 7]],  #two on two
+    [[0, 1, 3, 6], [0, 1, 2, 5], [2, 5, 7, 8], [3, 6, 7, 8]],  #L1
+    [[1, 2, 5, 8], [5, 6, 7, 8], [0, 3, 6, 7], [0, 1, 2, 8]],  #one one three
+    [[4, 6, 7, 8], [0, 3, 4, 6], [0, 1, 2, 4], [2, 4, 5, 8]]  #one on three
 ]
 
 
 class Block:
-    def __init__(self,x,y):
+    def __init__(self, x, y):
         self.x = x
         self.y = y
         self.type = 0
@@ -31,7 +31,7 @@ def draw_block():
                                  (255, 255, 255),
                                  [(x + block.x) * grid_size + x_gap + 1,
                                   (y + block.y) * grid_size + y_gap + 1,
-                                 grid_size -2 , grid_size - 2]
+                                  grid_size - 2, grid_size - 2]
                                  )
 
 
@@ -51,12 +51,27 @@ y_gap = (screen.get_height() - rows * grid_size) // 2
 clock = pygame.time.Clock()
 fps = 2
 
+game_board = []
+#initialise the gameboard
+for i in range(cols):
+    new_cols = []
+    for j in range(rows):
+        new_cols.append((0,0,0))
+    game_board.append(new_cols)
+
+
 
 
 def draw_grid(cols, rows, grid_size, x_gap, y_gap):
-    for y in range(rows): #rows
-        for x in range(cols): #columns
-            pygame.draw.rect(screen,(100,100,100), [x * grid_size + x_gap,y * grid_size + y_gap,grid_size,grid_size], 1)
+    for y in range(rows):  #rows
+        for x in range(cols):  #columns
+            pygame.draw.rect(screen, (100, 100, 100),
+                             [x * grid_size + x_gap, y * grid_size + y_gap, grid_size, grid_size], 1)
+            if game_board[x][y] != (0, 0, 0):
+                pygame.draw.rect(screen, game_board[x][y],
+                                 [x * grid_size + x_gap + 1, y * grid_size + y_gap + 1, grid_size, grid_size -1 ])
+
+
 
 def drop_block():
     can_drop = True
@@ -67,6 +82,13 @@ def drop_block():
                     can_drop = False
     if can_drop:
         block.y += 1
+    else:
+        for y in range(3):
+            for x in range(3):
+                if y * 3 + x in block.shape():
+                    game_board[x + block.x][y + block.y] = (0, 255, 0)
+    return can_drop
+
 
 def side_move(dx):
     can_move = True
@@ -81,12 +103,12 @@ def side_move(dx):
         block.x += dx
 
 
-
 while not game_over:
     clock.tick(fps)
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             game_over = True
+            continue
 
     if event.type == pygame.KEYDOWN:
         if event.key == pygame.K_LEFT:
@@ -94,17 +116,15 @@ while not game_over:
         if event.key == pygame.K_RIGHT:
             side_move(1)
 
-
     screen.fill((0, 0, 0))
-    draw_grid(rows, cols,grid_size,  x_gap, y_gap)
-    draw_block()
-    if event.type != pygame.KEYDOWN:
-        drop_block()
+    draw_grid(rows, cols, grid_size, x_gap, y_gap)
+    if block is not None:
+        draw_block()
+        if event.type != pygame.KEYDOWN:
+            if not drop_block():
+                block = None
+
 
     pygame.display.update()
 
-
-
 pygame.quit()
-
-
