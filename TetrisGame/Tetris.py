@@ -112,6 +112,24 @@ def side_move(dx):
     else:
         drop_block()
 
+def rotate():
+    last_rotation = block.rotation
+    block.rotation = (block.rotation + 1) % len(blocks[block.type])
+
+    can_rotate = True
+    for y in range(3):
+        for x in range(3):
+            if y * 3 + x in block.shape():
+                if block.y + y >= rows - 1 or \
+                        x + block.x >= cols - 1 or \
+                        x + block.x < 1 or \
+                        block.y + y < 0:
+                    can_rotate = False
+
+
+    if not can_rotate:
+        block.rotation = last_rotation
+
 
 while not game_over:
     clock.tick(fps)
@@ -119,12 +137,16 @@ while not game_over:
         if event.type == pygame.QUIT:
             game_over = True
             continue
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_UP: #call rotate()
+                rotate()
 
     if event.type == pygame.KEYDOWN:
         if event.key == pygame.K_LEFT:
             side_move(-1)
         if event.key == pygame.K_RIGHT:
             side_move(1)
+
 
     screen.fill((0, 0, 0))
     draw_grid(rows, cols, grid_size, x_gap, y_gap)
