@@ -172,6 +172,7 @@ def rotate():
         block.rotation = last_rotation
 
 score = 0
+font = pygame.font.SysFont('Arial', 30, True, False)
 
 while not game_over:
     clock.tick(fps)
@@ -199,7 +200,8 @@ while not game_over:
                 score += find_lines()
                 block = Block(random.randint(5, cols - 5), 0)
 
-
+    text = font.render("SCORE: " + str(score), True, (255, 255, 255))
+    screen.blit(text, [0,0])
     pygame.display.update()
 
 pygame.quit()
