@@ -27,7 +27,7 @@ colours = [
 
 
 pygame.init()
-screen = pygame.display.set_mode((800, 800))
+screen = pygame.display.set_mode((500, 500))
 pygame.display.set_caption('Tetris Game')
 game_over = False
 #variables for drawing grid
@@ -128,6 +128,20 @@ def drop_block():
                     game_board[x + block.x][y + block.y] = block.colour
     return can_drop
 
+def find_lines():
+    lines = 0
+    for y in range(rows):
+        empty = 0
+        for x in range(cols):
+            if game_board[x][y] == (0,0,0):
+                empty += 1
+        if empty == 0:
+            lines += 1
+            for y2 in range(y, 1, -1):
+                for x2 in range(cols):
+                    game_board[x2][y2] = game_board[x2][y2 - 1]
+
+    return lines
 
 def side_move(dx):
     can_move = True
@@ -157,6 +171,7 @@ def rotate():
     if not can_rotate:
         block.rotation = last_rotation
 
+score = 0
 
 while not game_over:
     clock.tick(fps)
@@ -175,14 +190,13 @@ while not game_over:
             side_move(1)
 
 
-
-
     screen.fill((0, 0, 0))
     draw_grid(rows, cols, grid_size, x_gap, y_gap)
     if block is not None:
         draw_block()
         if event.type != pygame.KEYDOWN:
             if not drop_block():
+                score += find_lines()
                 block = Block(random.randint(5, cols - 5), 0)
 
 
