@@ -1,4 +1,7 @@
 import pygame
+import random
+
+
 
 #blocks are the various shapes when occupied in a Matrix. Here it is a 3x3 Matrix
 blocks = [
@@ -11,12 +14,27 @@ blocks = [
     [[4, 6, 7, 8], [0, 3, 4, 6], [0, 1, 2, 4], [2, 4, 5, 8]]  #one on three
 ]
 
+pygame.init()
+screen = pygame.display.set_mode((800, 800))
+pygame.display.set_caption('Tetris Game')
+game_over = False
+#variables for drawing grid
+grid_size = 30
+cols = screen.get_width() // grid_size
+rows = screen.get_height() // grid_size
+x_gap = (screen.get_width() - cols * grid_size) // 2
+y_gap = (screen.get_height() - rows * grid_size) // 2
+
+
+
+clock = pygame.time.Clock()
+fps = 2
 
 class Block:
     def __init__(self, x, y):
         self.x = x
         self.y = y
-        self.type = 0
+        self.type = random.randint(0,6)
         self.rotation = 0
 
     def shape(self):
@@ -35,21 +53,11 @@ def draw_block():
                                  )
 
 
-pygame.init()
-screen = pygame.display.set_mode((800, 800))
-pygame.display.set_caption('Tetris Game')
-game_over = False
-block = Block(5, 6)
 
-#variables for drawing grid
-grid_size = 30
-cols = screen.get_width() // grid_size
-rows = screen.get_height() // grid_size
-x_gap = (screen.get_width() - cols * grid_size) // 2
-y_gap = (screen.get_height() - rows * grid_size) // 2
+block = Block((cols -1) // 2, 6)
 
-clock = pygame.time.Clock()
-fps = 2
+
+
 
 game_board = []
 #initialise the gameboard
@@ -101,6 +109,8 @@ def side_move(dx):
                     can_move = False
     if can_move:
         block.x += dx
+    else:
+        drop_block()
 
 
 while not game_over:
@@ -122,7 +132,7 @@ while not game_over:
         draw_block()
         if event.type != pygame.KEYDOWN:
             if not drop_block():
-                block = None
+                block = Block(random.randint(5, cols - 5), 0)
 
 
     pygame.display.update()
